@@ -1,0 +1,9 @@
+{
+  "name": "Kova AI",
+  "short_name": "Kova",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#0ea5e9",
+  "description": "Multimodal AI assistant and workspace PWA"
+}
