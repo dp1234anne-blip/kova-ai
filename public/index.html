@@ -2,611 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0ea5e9" />
-  <link rel="manifest" href="/manifest.json" />
-  <title>Kova AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Kova</title>
   <style>
     :root {
-      --bg: #070b14;
-      --panel: #0f172a;
-      --card: #1e293b;
-      --border: #334155;
-      --accent: #38bdf8;
-      --text: #f1f5f9;
+      --vvh: 100dvh;
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --text: #f8fafc;
       --muted: #94a3b8;
-      --green: #4ade80;
+      --accent: #38bdf8;
+      --border: #334155;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", system-ui, sans-serif; }
-    body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-    header {
-      background: var(--panel); border-bottom: 1px solid var(--border);
-      padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; color: var(--accent); letter-spacing: 0.5px; }
-    .badge { font-size: 0.72rem; background: var(--card); color: var(--green); padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); }
-    .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    button, select {
-      background: var(--card); color: var(--text); border: 1px solid var(--border);
-      padding: 7px 11px; border-radius: 8px; cursor: pointer; font-size: 0.84rem; font-weight: 600;
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: var(--vvh, 100dvh);
+      overflow-x: hidden;
     }
-    button:hover { border-color: var(--accent); }
-    .btn-primary { background: #0284c7; border-color: #0284c7; color: #fff; }
-    .btn-install { background: linear-gradient(135deg, #0284c7, #7e22ce); border: none; color: #fff; display: none; }
-    .btn-live-on { background: #14532d; border-color: #22c55e; color: #86efac; }
-    .workspace { display: grid; grid-template-columns: 1fr 350px; flex: 1; overflow: hidden; }
-    @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } .sidebar { display: none; } }
-    .chat-col { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-    #chatLog { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-    .msg { max-width: 84%; padding: 12px 15px; border-radius: 14px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
-    .msg.user { align-self: flex-end; background: #0c4a6e; border: 1px solid #0369a1; }
-    .msg.kova { align-self: flex-start; background: var(--panel); border: 1px solid var(--border); }
-    .msg-meta { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
-    .msg img { max-width: 280px; max-height: 240px; border-radius: 10px; margin-top: 8px; border: 1px solid var(--border); display: block; }
-    .media-strip, .voice-strip {
-      background: #0b1220; border-top: 1px solid var(--border); padding: 6px 16px;
-      display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: var(--muted); gap: 10px; flex-wrap: wrap;
+
+    .kova-app {
+      min-height: var(--vvh, 100dvh);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+      gap: 12px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
     }
-    .media-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    #attachedImgPreview { height: 42px; width: 42px; object-fit: cover; border-radius: 6px; border: 1px solid var(--accent); display: none; }
-    #voiceTranscriptPreview { color: var(--accent); font-style: italic; flex: 1; min-width: 140px; }
-    .input-bar {
-      background: var(--panel); border-top: 1px solid var(--border);
-      padding: 12px 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+
+    .kova-feed {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    #promptInput {
-      flex: 1; min-width: 180px; background: var(--card); color: var(--text); border: 1px solid var(--border);
-      border-radius: 10px; padding: 11px 14px; font-size: 0.95rem; outline: none;
+
+    .kova-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      line-height: 1.5;
+      font-size: 0.95rem;
     }
-    #promptInput:focus { border-color: var(--accent); }
-    .sidebar {
-      background: var(--panel); border-left: 1px solid var(--border);
-      display: flex; flex-direction: column; overflow-y: auto; padding: 12px; gap: 12px;
+
+    .kova-composer {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      min-width: 0;
     }
-    .side-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
-    .side-box h3 { font-size: 0.85rem; color: var(--accent); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-    textarea {
-      width: 100%; background: var(--card); color: var(--text); border: 1px solid var(--border);
-      border-radius: 8px; padding: 8px; font-size: 0.82rem; resize: vertical;
+
+    .kova-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-width: 0;
     }
-    .item-list { list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 130px; overflow-y: auto; font-size: 0.82rem; }
-    .item-list li { background: var(--card); padding: 6px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .row-inline { display: flex; gap: 6px; margin-top: 6px; }
-    .row-inline input { flex: 1; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 0.82rem; }
-    video#screenPreview, video#cameraPreview { width: 100%; border-radius: 8px; display: none; border: 1px solid var(--accent); margin-top: 6px; }
+
+    .kova-input-row input,
+    .kova-input-row textarea,
+    .kova-input-field {
+      flex: 1 1 0;
+      min-width: 0;
+      width: 100%;
+      background: #0f172a;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .kova-input-row button,
+    .kova-send-btn {
+      flex-shrink: 0;
+      white-space: nowrap;
+      background: var(--accent);
+      color: #082f49;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <span>KOVA</span>
-      <span class="badge" id="statusBadge">Ready</span>
-    </div>
-    <div class="controls">
-      <button id="installBtn" class="btn-install">Install Kova App</button>
-      <select id="modeSelect">
-        <option value="deep">Deep Think (Groq + Gemini)</option>
-        <option value="fast">Fast Reply (Groq)</option>
-      </select>
-      <select id="langSelect">
-        <option value="en-US">English (US)</option>
-        <option value="en-KE">English (Kenya)</option>
-        <option value="sw-KE">Swahili (Kenya)</option>
-        <option value="fr-FR">French</option>
-        <option value="es-ES">Spanish</option>
-      </select>
-      <button id="cameraBtn">Camera: OFF</button>
-      <button id="screenBtn">Share Screen</button>
-      <button id="voiceBtn">Voice Chat: OFF</button>
-      <button id="speakToggleBtn">Voice Out: ON</button>
-    </div>
-  </header>
-
-  <div class="workspace">
-    <div class="chat-col">
-      <div id="chatLog"></div>
-      <div class="media-strip">
-        <div class="media-left">
-          <img id="attachedImgPreview" alt="Attached preview" />
-          <span id="mediaStatus">No image attached • Camera: Off • Screen: Off</span>
-        </div>
-        <div class="media-left">
-          <button id="clearImgBtn" style="padding:3px 8px;font-size:0.75rem;display:none;">Remove Image</button>
-          <button id="snapCameraBtn" style="padding:3px 8px;font-size:0.75rem;display:none;">Snap Camera</button>
-          <button id="analyzeScreenBtn" style="padding:3px 8px;font-size:0.75rem;">Analyze Screen</button>
-        </div>
-      </div>
-      <div class="voice-strip">
-        <button id="voiceChatBarBtn" style="padding:4px 10px;font-size:0.78rem;">Start Voice Chat</button>
-        <span id="voiceTranscriptPreview">Voice chat idle — speak or click Start Voice Chat</span>
-        <button id="stopSpeakBtn" style="padding:4px 8px;font-size:0.75rem;">Mute Speech</button>
-      </div>
-      <div class="input-bar">
-        <label style="cursor:pointer;background:var(--card);border:1px solid var(--border);padding:8px 11px;border-radius:8px;font-size:0.84rem;font-weight:600;">
-          Upload Image
-          <input type="file" id="imageUploadInput" accept="image/*" hidden />
-        </label>
-        <button id="enhanceBtn">Enhance</button>
-        <button id="imgBtn">Create Image</button>
-        <input id="promptInput" type="text" placeholder="Ask Kova, upload/snap an image, voice chat, or create an image..." />
-        <button id="sendBtn" class="btn-primary">Send</button>
+  <div class="kova-app">
+    <div class="kova-feed" id="kovaFeed">
+      <div class="kova-card">
+        <strong>Kova</strong>
+        <p style="color: var(--muted); margin-top: 4px;">
+          Kova is ready. Type a prompt below to test mobile input layout and send behavior.
+        </p>
       </div>
     </div>
 
-    <aside class="sidebar">
-      <div class="side-box">
-        <h3><span>Live Camera Preview</span></h3>
-        <video id="cameraPreview" autoplay muted playsinline></video>
+    <div class="kova-composer">
+      <div class="kova-input-row">
+        <input
+          id="kovaPromptInput"
+          type="text"
+          class="kova-input-field"
+          placeholder="Ask Kova, upload/snap an image, voice chat..."
+        />
+        <button id="kovaSendBtn" type="button" class="kova-send-btn">Send</button>
       </div>
-      <div class="side-box">
-        <h3><span>Live Screen Preview</span></h3>
-        <video id="screenPreview" autoplay muted playsinline></video>
-      </div>
-      <div class="side-box">
-        <h3>
-          <span>File Reader & Editor</span>
-          <label style="cursor:pointer;color:#fde68a;">Open File<input type="file" id="fileInput" hidden /></label>
-        </h3>
-        <input id="fileNameInput" type="text" value="kova_notes.md" style="width:100%;margin-bottom:6px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:0.8rem;" />
-        <textarea id="fileEditor" rows="5" placeholder="Load a file or edit text/code here..."></textarea>
-        <div class="row-inline">
-          <button id="saveFileBtn" style="flex:1;">Save / Download</button>
-        </div>
-      </div>
-      <div class="side-box">
-        <h3><span>Task Manager</span></h3>
-        <ul id="taskList" class="item-list"></ul>
-        <div class="row-inline">
-          <input id="taskInput" type="text" placeholder="Add a task..." />
-          <button id="addTaskBtn">Add</button>
-        </div>
-      </div>
-      <div class="side-box">
-        <h3><span>Saved User Info</span></h3>
-        <ul id="memoryList" class="item-list"></ul>
-        <div class="row-inline">
-          <input id="memInput" type="text" placeholder="Save info..." />
-          <button id="addMemBtn">Save</button>
-        </div>
-      </div>
-    </aside>
+    </div>
   </div>
 
   <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
-    let deferredInstallPrompt = null;
-    const installBtn = document.getElementById("installBtn");
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredInstallPrompt = e;
-      installBtn.style.display = "inline-block";
-    });
-    installBtn.addEventListener("click", async () => {
-      if (!deferredInstallPrompt) return;
-      deferredInstallPrompt.prompt();
-      await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
-      installBtn.style.display = "none";
-    });
-
-    let tasks = JSON.parse(localStorage.getItem("kova_tasks") || "[]");
-    let memory = JSON.parse(localStorage.getItem("kova_memory") || "[]");
-    let chatHistory = [];
-    let attachedImageBase64 = null;
-    let screenStream = null;
-    let cameraStream = null;
-    let liveVoiceActive = false;
-    let voiceOutEnabled = true;
-
-    const chatLog = document.getElementById("chatLog");
-    const promptInput = document.getElementById("promptInput");
-    const statusBadge = document.getElementById("statusBadge");
-    const screenPreview = document.getElementById("screenPreview");
-    const cameraPreview = document.getElementById("cameraPreview");
-    const attachedImgPreview = document.getElementById("attachedImgPreview");
-    const clearImgBtn = document.getElementById("clearImgBtn");
-    const snapCameraBtn = document.getElementById("snapCameraBtn");
-    const mediaStatus = document.getElementById("mediaStatus");
-    const voiceTranscriptPreview = document.getElementById("voiceTranscriptPreview");
-
-    function refreshMediaStatus() {
-      const parts = [
-        attachedImageBase64 ? "Image Attached" : "No image attached",
-        cameraStream ? "Camera: LIVE" : "Camera: Off",
-        screenStream ? "Screen: LIVE" : "Screen: Off",
-      ];
-      mediaStatus.textContent = parts.join(" • ");
-    }
-
-    function addMessage(sender, text, type = "kova", imgUrl = null) {
-      const div = document.createElement("div");
-      div.className = `msg ${type}`;
-      const meta = document.createElement("div");
-      meta.className = "msg-meta";
-      meta.textContent = sender;
-      div.appendChild(meta);
-      const body = document.createElement("div");
-      body.textContent = text;
-      div.appendChild(body);
-      if (imgUrl) {
-        const img = document.createElement("img");
-        img.src = imgUrl;
-        div.appendChild(img);
+    (function syncKovaViewport() {
+      function updateVVH() {
+        const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        document.documentElement.style.setProperty("--vvh", `${Math.round(h)}px`);
       }
-      chatLog.appendChild(div);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
-
-    function speakText(text) {
-      if (!voiceOutEnabled || !("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const clean = text.replace(/```[\s\S]*?```/g, "Code block displayed.").replace(/[*#`>-]/g, " ");
-      const utter = new SpeechSynthesisUtterance(clean.slice(0, 600));
-      utter.lang = document.getElementById("langSelect").value;
-      utter.rate = 1.04;
-      window.speechSynthesis.speak(utter);
-    }
-
-    document.getElementById("imageUploadInput").addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        attachedImageBase64 = reader.result;
-        attachedImgPreview.src = attachedImageBase64;
-        attachedImgPreview.style.display = "block";
-        clearImgBtn.style.display = "inline-block";
-        refreshMediaStatus();
-      };
-      reader.readAsDataURL(file);
-    });
-
-    clearImgBtn.onclick = () => {
-      attachedImageBase64 = null;
-      attachedImgPreview.src = "";
-      attachedImgPreview.style.display = "none";
-      clearImgBtn.style.display = "none";
-      document.getElementById("imageUploadInput").value = "";
-      refreshMediaStatus();
-    };
-
-    document.getElementById("cameraBtn").onclick = async () => {
-      if (cameraStream) {
-        cameraStream.getTracks().forEach((t) => t.stop());
-        cameraStream = null;
-        cameraPreview.style.display = "none";
-        snapCameraBtn.style.display = "none";
-        document.getElementById("cameraBtn").textContent = "Camera: OFF";
-        refreshMediaStatus();
-        return;
+      updateVVH();
+      window.addEventListener("resize", updateVVH);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", updateVVH);
+        window.visualViewport.addEventListener("scroll", updateVVH);
       }
-      try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
-        cameraPreview.srcObject = cameraStream;
-        cameraPreview.style.display = "block";
-        snapCameraBtn.style.display = "inline-block";
-        document.getElementById("cameraBtn").textContent = "Camera: ON";
-        refreshMediaStatus();
-      } catch (err) {
-        addMessage("Camera Error", err.message, "kova");
+    })();
+
+    (function wireBasicSendPreview() {
+      const input = document.getElementById("kovaPromptInput");
+      const btn = document.getElementById("kovaSendBtn");
+      const feed = document.getElementById("kovaFeed");
+      if (!input || !btn || !feed) return;
+
+      function addCard(sender, text) {
+        const card = document.createElement("div");
+        card.className = "kova-card";
+        const title = document.createElement("strong");
+        title.textContent = sender;
+        const body = document.createElement("p");
+        body.style.marginTop = "4px";
+        body.textContent = text;
+        card.appendChild(title);
+        card.appendChild(body);
+        feed.appendChild(card);
+        feed.scrollTop = feed.scrollHeight;
       }
-    };
 
-    function captureCameraFrame() {
-      if (!cameraStream || cameraPreview.videoWidth === 0) return null;
-      const canvas = document.createElement("canvas");
-      canvas.width = cameraPreview.videoWidth;
-      canvas.height = cameraPreview.videoHeight;
-      canvas.getContext("2d").drawImage(cameraPreview, 0, 0);
-      return canvas.toDataURL("image/png");
-    }
-
-    snapCameraBtn.onclick = () => {
-      const frame = captureCameraFrame();
-      if (!frame) return;
-      attachedImageBase64 = frame;
-      attachedImgPreview.src = frame;
-      attachedImgPreview.style.display = "block";
-      clearImgBtn.style.display = "inline-block";
-      refreshMediaStatus();
-      sendPrompt("Look at this photo from my camera and tell me what you see.");
-    };
-
-    function renderTasks() {
-      localStorage.setItem("kova_tasks", JSON.stringify(tasks));
-      const ul = document.getElementById("taskList");
-      ul.innerHTML = "";
-      tasks.forEach((t, idx) => {
-        const li = document.createElement("li");
-        const span = document.createElement("span");
-        span.textContent = t.title;
-        span.style.textDecoration = t.done ? "line-through" : "none";
-        span.style.cursor = "pointer";
-        span.onclick = () => { tasks[idx].done = !tasks[idx].done; renderTasks(); };
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "X";
-        delBtn.style.padding = "2px 6px";
-        delBtn.style.fontSize = "0.72rem";
-        delBtn.onclick = () => { tasks.splice(idx, 1); renderTasks(); };
-        li.appendChild(span);
-        li.appendChild(delBtn);
-        ul.appendChild(li);
+      btn.addEventListener("click", () => {
+        const val = input.value.trim();
+        if (!val) return;
+        addCard("You", val);
+        input.value = "";
       });
-    }
 
-    document.getElementById("addTaskBtn").onclick = () => {
-      const inp = document.getElementById("taskInput");
-      if (!inp.value.trim()) return;
-      tasks.push({ title: inp.value.trim(), done: false });
-      inp.value = "";
-      renderTasks();
-    };
-
-    function renderMemory() {
-      localStorage.setItem("kova_memory", JSON.stringify(memory));
-      const ul = document.getElementById("memoryList");
-      ul.innerHTML = "";
-      memory.forEach((m, idx) => {
-        const li = document.createElement("li");
-        const span = document.createElement("span");
-        span.textContent = m;
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "X";
-        delBtn.style.padding = "2px 6px";
-        delBtn.style.fontSize = "0.72rem";
-        delBtn.onclick = () => { memory.splice(idx, 1); renderMemory(); };
-        li.appendChild(span);
-        li.appendChild(delBtn);
-        ul.appendChild(li);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          btn.click();
+        }
       });
-    }
-
-    document.getElementById("addMemBtn").onclick = () => {
-      const inp = document.getElementById("memInput");
-      if (!inp.value.trim()) return;
-      memory.push(inp.value.trim());
-      inp.value = "";
-      renderMemory();
-    };
-
-    renderTasks();
-    renderMemory();
-
-    document.getElementById("fileInput").addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      document.getElementById("fileNameInput").value = file.name;
-      const reader = new FileReader();
-      reader.onload = () => {
-        document.getElementById("fileEditor").value = reader.result;
-        addMessage("System", `Loaded "${file.name}" into editor.`, "kova");
-      };
-      reader.readAsText(file);
-    });
-
-    document.getElementById("saveFileBtn").onclick = () => {
-      const name = document.getElementById("fileNameInput").value.trim() || "kova_notes.md";
-      const content = document.getElementById("fileEditor").value;
-      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = name;
-      a.click();
-    };
-
-    document.getElementById("screenBtn").onclick = async () => {
-      if (screenStream) {
-        screenStream.getTracks().forEach((t) => t.stop());
-        screenStream = null;
-        screenPreview.style.display = "none";
-        document.getElementById("screenBtn").textContent = "Share Screen";
-        refreshMediaStatus();
-        return;
-      }
-      try {
-        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-        screenPreview.srcObject = screenStream;
-        screenPreview.style.display = "block";
-        document.getElementById("screenBtn").textContent = "Stop Share";
-        refreshMediaStatus();
-      } catch (err) {
-        addMessage("System", "Screen share error: " + err.message, "kova");
-      }
-    };
-
-    function grabScreenFrame() {
-      if (!screenStream || screenPreview.videoWidth === 0) return null;
-      const canvas = document.createElement("canvas");
-      canvas.width = screenPreview.videoWidth;
-      canvas.height = screenPreview.videoHeight;
-      canvas.getContext("2d").drawImage(screenPreview, 0, 0);
-      return canvas.toDataURL("image/png");
-    }
-
-    document.getElementById("analyzeScreenBtn").onclick = () => {
-      if (!screenStream) {
-        addMessage("System", "Click 'Share Screen' first.", "kova");
-        return;
-      }
-      sendPrompt("Analyze my shared screen right now and summarize what is visible and what to do next.");
-    };
-
-    async function sendPrompt(overrideText = null) {
-      const rawText = (overrideText !== null ? overrideText : promptInput.value).trim();
-      const visionImage = attachedImageBase64 || grabScreenFrame();
-      const text = rawText || (visionImage ? "Analyze this image and explain what you see." : "");
-      if (!text) return;
-      if (overrideText === null) promptInput.value = "";
-
-      if (/^remember\s+/i.test(text)) {
-        const fact = text.replace(/^remember\s+/i, "").trim();
-        if (fact) { memory.push(fact); renderMemory(); }
-      }
-      if (/^(add task|create task|remind me to)\s+/i.test(text)) {
-        const taskTitle = text.replace(/^(add task|create task|remind me to)\s+/i, "").trim();
-        if (taskTitle) { tasks.push({ title: taskTitle, done: false }); renderTasks(); }
-      }
-
-      addMessage("You", text, "user", attachedImageBase64 || null);
-      statusBadge.textContent = "Thinking...";
-
-      const fileContent = document.getElementById("fileEditor").value.trim();
-      const fileContext = fileContent
-        ? { name: document.getElementById("fileNameInput").value, content: fileContent }
-        : null;
-
-      try {
-        const resp = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: text,
-            mode: document.getElementById("modeSelect").value,
-            language: document.getElementById("langSelect").selectedOptions[0].text,
-            memory,
-            tasks,
-            fileContext,
-            screenImageBase64: visionImage,
-            history: chatHistory,
-          }),
-        });
-        const data = await resp.json();
-        if (!resp.ok || data.error) throw new Error(data.error || "Request failed");
-
-        chatHistory.push({ role: "user", content: text }, { role: "assistant", content: data.reply });
-        addMessage(data.engine || "Kova", data.reply, "kova");
-        speakText(data.reply);
-        statusBadge.textContent = "Ready";
-      } catch (err) {
-        addMessage("Error", err.message, "kova");
-        statusBadge.textContent = "Error";
-      }
-    }
-
-    document.getElementById("sendBtn").onclick = () => sendPrompt();
-    promptInput.addEventListener("keydown", (e) => { if (e.key === "Enter") sendPrompt(); });
-
-    document.getElementById("enhanceBtn").onclick = async () => {
-      const raw = promptInput.value.trim();
-      if (!raw) return;
-      statusBadge.textContent = "Enhancing...";
-      try {
-        const res = await fetch("/api/enhance", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: raw, goal: "general" }),
-        });
-        const data = await res.json();
-        if (data.enhanced) promptInput.value = data.enhanced;
-      } finally {
-        statusBadge.textContent = "Ready";
-      }
-    };
-
-    document.getElementById("imgBtn").onclick = async () => {
-      const raw = promptInput.value.trim();
-      if (!raw) {
-        addMessage("System", "Type what image you want to create, then click Create Image.", "kova");
-        return;
-      }
-      promptInput.value = "";
-      addMessage("You", `Create image: ${raw}`, "user");
-      statusBadge.textContent = "Creating image...";
-      try {
-        const res = await fetch("/api/image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: raw }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data || data.error || !data.imageUrl) {
-          throw new Error(data?.error || "Image failed");
-        }
-        addMessage("Kova Studio", "Image created:", "kova", data.imageUrl);
-        speakText("Your image is ready.");
-        statusBadge.textContent = "Ready";
-      } catch (err) {
-        addMessage("Image Error", err.message, "kova");
-        statusBadge.textContent = "Error";
-      }
-    };
-
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    if (SpeechRec) {
-      recognition = new SpeechRec();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.onresult = (event) => {
-        let interim = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const resItem = event.results[i];
-          const phrase = resItem[0].transcript.trim();
-          if (resItem.isFinal && phrase) {
-            voiceTranscriptPreview.textContent = `Heard: "${phrase}"`;
-            if (/^(stop|quiet|cancel)$/i.test(phrase)) {
-              window.speechSynthesis.cancel();
-              return;
-            }
-            sendPrompt(phrase);
-          } else if (phrase) {
-            interim += phrase + " ";
-          }
-        }
-        if (interim.trim()) {
-          voiceTranscriptPreview.textContent = `Listening: "${interim.trim()}"`;
-        }
-      };
-      recognition.onend = () => {
-        if (liveVoiceActive) {
-          try { recognition.start(); } catch (_e) {}
-        }
-      };
-    }
-
-    function toggleVoiceChat() {
-      if (!recognition) {
-        voiceTranscriptPreview.textContent = "Voice recognition works best in Chrome or Edge.";
-        return;
-      }
-      liveVoiceActive = !liveVoiceActive;
-      const topBtn = document.getElementById("voiceBtn");
-      const barBtn = document.getElementById("voiceChatBarBtn");
-      if (liveVoiceActive) {
-        recognition.lang = document.getElementById("langSelect").value;
-        recognition.start();
-        topBtn.textContent = "Voice Chat: ON";
-        topBtn.classList.add("btn-live-on");
-        barBtn.textContent = "Stop Voice Chat";
-        barBtn.classList.add("btn-live-on");
-        voiceTranscriptPreview.textContent = "Listening... speak now";
-      } else {
-        recognition.stop();
-        topBtn.textContent = "Voice Chat: OFF";
-        topBtn.classList.remove("btn-live-on");
-        barBtn.textContent = "Start Voice Chat";
-        barBtn.classList.remove("btn-live-on");
-        voiceTranscriptPreview.textContent = "Voice chat stopped";
-      }
-    }
-
-    document.getElementById("voiceBtn").onclick = toggleVoiceChat;
-    document.getElementById("voiceChatBarBtn").onclick = toggleVoiceChat;
-
-    document.getElementById("stopSpeakBtn").onclick = () => {
-      window.speechSynthesis.cancel();
-      voiceTranscriptPreview.textContent = "Speech playback stopped";
-    };
-
-    document.getElementById("speakToggleBtn").onclick = () => {
-      voiceOutEnabled = !voiceOutEnabled;
-      if (!voiceOutEnabled) window.speechSynthesis.cancel();
-      document.getElementById("speakToggleBtn").textContent = `Voice Out: ${voiceOutEnabled ? "ON" : "OFF"}`;
-    };
-
-    addMessage("Kova", "Kova is live. Upload an image, turn on Camera or Screen Share, start Voice Chat, or type a prompt.", "kova");
+    })();
   </script>
 </body>
 </html>
