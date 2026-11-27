@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Kova</title>
+  <title>KOVA</title>
   <style>
     :root {
       --vvh: 100dvh;
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
+      --bg: #0b1220;
+      --panel: #111b2e;
+      --card: #162238;
+      --btn: #1e2d48;
+      --btn-hover: #273a5c;
+      --text: #e6edf7;
+      --muted: #9fb0c8;
       --accent: #38bdf8;
-      --border: #334155;
+      --ok: #22c55e;
+      --border: #283a58;
     }
 
     * {
@@ -22,54 +26,141 @@
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
 
-    body {
+    html, body {
       background: var(--bg);
       color: var(--text);
       min-height: var(--vvh, 100dvh);
+      min-width: 0;
       overflow-x: hidden;
     }
 
     .kova-app {
       min-height: var(--vvh, 100dvh);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 12px;
-      padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
-      gap: 12px;
-      max-width: 900px;
+      max-width: 960px;
       width: 100%;
       margin: 0 auto;
-    }
-
-    .kova-feed {
-      flex: 1 1 auto;
-      min-height: 0;
-      overflow-y: auto;
+      padding: 12px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));
       display: flex;
       flex-direction: column;
       gap: 10px;
+      min-width: 0;
     }
 
-    .kova-card {
-      background: var(--panel);
+    .kova-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .kova-brand {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #60a5fa;
+    }
+
+    .kova-status {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #86efac;
+      background: #122b21;
+      border: 1px solid #1f513b;
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+
+    .kova-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    select,
+    .kova-tool-btn,
+    .kova-sec-btn {
+      background: var(--btn);
+      color: var(--text);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      line-height: 1.5;
-      font-size: 0.95rem;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    .kova-composer {
+    select:hover,
+    .kova-tool-btn:hover,
+    .kova-sec-btn:hover {
+      background: var(--btn-hover);
+    }
+
+    .kova-panel {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .kova-msg-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      max-height: 240px;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      width: 100%;
+    }
+
+    .kova-msg-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .kova-msg-text {
+      font-size: 0.94rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .kova-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .kova-voice-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .kova-voice-status {
+      font-size: 0.84rem;
+      color: var(--muted);
+      flex: 1 1 160px;
       min-width: 0;
+    }
+
+    .kova-action-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .kova-input-row {
@@ -86,7 +177,7 @@
       flex: 1 1 0;
       min-width: 0;
       width: 100%;
-      background: #0f172a;
+      background: var(--card);
       color: var(--text);
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -95,42 +186,183 @@
       outline: none;
     }
 
+    .kova-input-row input:focus,
+    .kova-input-row textarea:focus,
+    .kova-input-field:focus {
+      border-color: var(--accent);
+    }
+
     .kova-input-row button,
     .kova-send-btn {
       flex-shrink: 0;
       white-space: nowrap;
       background: var(--accent);
-      color: #082f49;
+      color: #062238;
       border: none;
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .kova-preview-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .kova-editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .kova-editor-title {
+      font-weight: 700;
+      color: #60a5fa;
+      font-size: 0.95rem;
+    }
+
+    .kova-editor-link {
+      background: none;
+      border: none;
+      color: #60a5fa;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .kova-editor-filename {
+      width: 100%;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 0.9rem;
+    }
+
+    .kova-editor-area {
+      width: 100%;
+      min-height: 120px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 16px;
+      resize: vertical;
+      outline: none;
+    }
+
+    .kova-save-btn {
+      width: 100%;
+      background: var(--btn);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
       font-size: 0.92rem;
       font-weight: 700;
       cursor: pointer;
+    }
+
+    .kova-save-btn:hover {
+      background: var(--btn-hover);
+    }
+
+    video, canvas {
+      max-width: 100%;
+      border-radius: 10px;
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="kova-app">
-    <div class="kova-feed" id="kovaFeed">
-      <div class="kova-card">
-        <strong>Kova</strong>
-        <p style="color: var(--muted); margin-top: 4px;">
-          Kova is ready. Type a prompt below to test mobile input layout and send behavior.
-        </p>
-      </div>
+    <div class="kova-header">
+      <span class="kova-brand">KOVA</span>
+      <span class="kova-status" id="kovaStatus">Ready</span>
     </div>
 
-    <div class="kova-composer">
+    <div class="kova-toolbar">
+      <select id="kovaModeSelect" aria-label="Reasoning mode">
+        <option value="deep-think">Deep Think (Groq + Gemini)</option>
+        <option value="fast">Fast Tutor</option>
+        <option value="study-notes">Study Notes</option>
+      </select>
+      <select id="kovaLangSelect" aria-label="Language">
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+        <option value="sw-KE">Swahili</option>
+      </select>
+      <button type="button" class="kova-tool-btn" id="camToggleBtn">Camera: OFF</button>
+      <button type="button" class="kova-tool-btn" id="screenShareBtn">Share Screen</button>
+      <button type="button" class="kova-tool-btn" id="voiceChatBtn">Voice Chat: OFF</button>
+      <button type="button" class="kova-tool-btn" id="voiceOutBtn">Voice Out: ON</button>
+    </div>
+
+    <div class="kova-panel">
+      <div class="kova-msg-box" id="kovaFeed">
+        <div>
+          <div class="kova-msg-label">Kova</div>
+          <div class="kova-msg-text">Kova is live. Upload an image, turn on Camera or Screen Share, start Voice Chat, or type a prompt.</div>
+        </div>
+      </div>
+
+      <div class="kova-meta-row">
+        <span id="attachStatus">No image attached • Camera: Off • Screen: Off</span>
+        <button type="button" class="kova-sec-btn" id="analyzeScreenBtn">Analyze Screen</button>
+      </div>
+
+      <div class="kova-voice-row">
+        <button type="button" class="kova-sec-btn" id="startVoiceBtn">Start Voice Chat</button>
+        <span class="kova-voice-status" id="voiceStatusText">Voice chat idle — speak or click Start Voice Chat</span>
+        <button type="button" class="kova-sec-btn" id="muteSpeechBtn">Mute Speech</button>
+      </div>
+
+      <div class="kova-action-row">
+        <input type="file" id="imageUploadInput" accept="image/*" style="display:none;" />
+        <button type="button" class="kova-sec-btn" id="uploadImageBtn">Upload Image</button>
+        <button type="button" class="kova-sec-btn" id="enhanceBtn">Enhance</button>
+        <button type="button" class="kova-sec-btn" id="createImageBtn">Create Image</button>
+      </div>
+
       <div class="kova-input-row">
         <input
-          id="kovaPromptInput"
           type="text"
+          id="kovaPromptInput"
           class="kova-input-field"
           placeholder="Ask Kova, upload/snap an image, voice chat..."
         />
-        <button id="kovaSendBtn" type="button" class="kova-send-btn">Send</button>
+        <button type="button" id="kovaSendBtn" class="kova-send-btn">Send</button>
       </div>
+    </div>
+
+    <div class="kova-preview-box">
+      <div>Live Camera Preview</div>
+      <video id="cameraVideo" autoplay playsinline></video>
+    </div>
+
+    <div class="kova-preview-box">
+      <div>Live Screen Preview</div>
+      <video id="screenVideo" autoplay playsinline></video>
+    </div>
+
+    <div class="kova-panel">
+      <div class="kova-editor-header">
+        <span class="kova-editor-title">File Reader &amp; Editor</span>
+        <button type="button" class="kova-editor-link" id="openEditorFileBtn">Open File</button>
+        <input type="file" id="editorFileInput" style="display:none;" />
+      </div>
+      <input type="text" class="kova-editor-filename" id="editorFilename" value="kova_notes.md" />
+      <textarea class="kova-editor-area" id="editorContent" placeholder="Load a file or edit text/code here..."></textarea>
+      <button type="button" class="kova-save-btn" id="saveEditorFileBtn">Save / Download</button>
     </div>
   </div>
 
@@ -148,38 +380,176 @@
       }
     })();
 
-    (function wireBasicSendPreview() {
-      const input = document.getElementById("kovaPromptInput");
-      const btn = document.getElementById("kovaSendBtn");
+    (function wireKovaControls() {
       const feed = document.getElementById("kovaFeed");
-      if (!input || !btn || !feed) return;
+      const input = document.getElementById("kovaPromptInput");
+      const sendBtn = document.getElementById("kovaSendBtn");
+      const uploadBtn = document.getElementById("uploadImageBtn");
+      const fileInp = document.getElementById("imageUploadInput");
+      const attachStatus = document.getElementById("attachStatus");
+      const camBtn = document.getElementById("camToggleBtn");
+      const screenBtn = document.getElementById("screenShareBtn");
+      const voiceBtn = document.getElementById("voiceChatBtn");
+      const voiceOutBtn = document.getElementById("voiceOutBtn");
+      const startVoiceBtn = document.getElementById("startVoiceBtn");
+      const muteSpeechBtn = document.getElementById("muteSpeechBtn");
+      const voiceStatusText = document.getElementById("voiceStatusText");
+      const camVideo = document.getElementById("cameraVideo");
+      const screenVideo = document.getElementById("screenVideo");
+      const openFileBtn = document.getElementById("openEditorFileBtn");
+      const editorFileInput = document.getElementById("editorFileInput");
+      const editorFilename = document.getElementById("editorFilename");
+      const editorContent = document.getElementById("editorContent");
+      const saveEditorFileBtn = document.getElementById("saveEditorFileBtn");
 
-      function addCard(sender, text) {
-        const card = document.createElement("div");
-        card.className = "kova-card";
-        const title = document.createElement("strong");
-        title.textContent = sender;
-        const body = document.createElement("p");
-        body.style.marginTop = "4px";
+      let camOn = false;
+      let screenOn = false;
+      let voiceOn = false;
+      let voiceOutOn = true;
+      let attachedName = "";
+
+      function updateMeta() {
+        const imgText = attachedName ? `Attached: ${attachedName}` : "No image attached";
+        attachStatus.textContent = `${imgText} • Camera: ${camOn ? "On" : "Off"} • Screen: ${screenOn ? "On" : "Off"}`;
+      }
+
+      function appendMessage(sender, text) {
+        const wrap = document.createElement("div");
+        const label = document.createElement("div");
+        label.className = "kova-msg-label";
+        label.textContent = sender;
+        const body = document.createElement("div");
+        body.className = "kova-msg-text";
         body.textContent = text;
-        card.appendChild(title);
-        card.appendChild(body);
-        feed.appendChild(card);
+        wrap.appendChild(label);
+        wrap.appendChild(body);
+        feed.appendChild(wrap);
         feed.scrollTop = feed.scrollHeight;
       }
 
-      btn.addEventListener("click", () => {
-        const val = input.value.trim();
-        if (!val) return;
-        addCard("You", val);
+      async function handleSend() {
+        const text = input.value.trim();
+        if (!text && !attachedName) return;
+        appendMessage("You", text || `[Attached ${attachedName}]`);
         input.value = "";
+        try {
+          const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: text,
+              mode: document.getElementById("kovaModeSelect").value,
+              language: document.getElementById("kovaLangSelect").value
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            appendMessage("Kova", data.reply || data.message || "Response received.");
+          } else {
+            appendMessage("Kova", "Ready to process your prompt.");
+          }
+        } catch (_) {
+          appendMessage("Kova", "Ready to process your prompt.");
+        }
+      }
+
+      sendBtn.addEventListener("click", handleSend);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          handleSend();
+        }
       });
 
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          btn.click();
+      uploadBtn.addEventListener("click", () => fileInp.click());
+      fileInp.addEventListener("change", () => {
+        attachedName = fileInp.files && fileInp.files[0] ? fileInp.files[0].name : "";
+        updateMeta();
+      });
+
+      camBtn.addEventListener("click", async () => {
+        if (!camOn && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            camVideo.srcObject = stream;
+            camVideo.style.display = "block";
+            camOn = true;
+          } catch (_) {
+            camOn = !camOn;
+          }
+        } else {
+          if (camVideo.srcObject) {
+            camVideo.srcObject.getTracks().forEach((t) => t.stop());
+            camVideo.srcObject = null;
+          }
+          camVideo.style.display = "none";
+          camOn = false;
         }
+        camBtn.textContent = `Camera: ${camOn ? "ON" : "OFF"}`;
+        updateMeta();
+      });
+
+      screenBtn.addEventListener("click", async () => {
+        if (!screenOn && navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+          try {
+            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+            screenVideo.srcObject = stream;
+            screenVideo.style.display = "block";
+            screenOn = true;
+          } catch (_) {
+            screenOn = !screenOn;
+          }
+        } else {
+          if (screenVideo.srcObject) {
+            screenVideo.srcObject.getTracks().forEach((t) => t.stop());
+            screenVideo.srcObject = null;
+          }
+          screenVideo.style.display = "none";
+          screenOn = false;
+        }
+        screenBtn.textContent = screenOn ? "Stop Screen" : "Share Screen";
+        updateMeta();
+      });
+
+      function toggleVoice() {
+        voiceOn = !voiceOn;
+        voiceBtn.textContent = `Voice Chat: ${voiceOn ? "ON" : "OFF"}`;
+        startVoiceBtn.textContent = voiceOn ? "Stop Voice Chat" : "Start Voice Chat";
+        voiceStatusText.textContent = voiceOn ? "Voice chat active — listening..." : "Voice chat idle — speak or click Start Voice Chat";
+      }
+
+      voiceBtn.addEventListener("click", toggleVoice);
+      startVoiceBtn.addEventListener("click", toggleVoice);
+
+      voiceOutBtn.addEventListener("click", () => {
+        voiceOutOn = !voiceOutOn;
+        voiceOutBtn.textContent = `Voice Out: ${voiceOutOn ? "ON" : "OFF"}`;
+      });
+
+      muteSpeechBtn.addEventListener("click", () => {
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        voiceOutOn = false;
+        voiceOutBtn.textContent = "Voice Out: OFF";
+      });
+
+      openFileBtn.addEventListener("click", () => editorFileInput.click());
+      editorFileInput.addEventListener("change", () => {
+        const f = editorFileInput.files && editorFileInput.files[0];
+        if (!f) return;
+        editorFilename.value = f.name;
+        const reader = new FileReader();
+        reader.onload = () => {
+          editorContent.value = String(reader.result || "");
+        };
+        reader.readAsText(f);
+      });
+
+      saveEditorFileBtn.addEventListener("click", () => {
+        const blob = new Blob([editorContent.value], { type: "text/plain;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = editorFilename.value.trim() || "kova_notes.md";
+        a.click();
       });
     })();
   </script>
